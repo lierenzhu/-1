@@ -13,24 +13,51 @@ typedef struct node
 	struct node *next;
 }Linknode, *Link;
 
-Link Createlist()
+Link Createlist(int isFromFile)
 {
-	int a;
-	Link H, p, r;
-	H = (Link)malloc(sizeof(Linknode));
-	r = H;
-	
-	while (scanf("%d", &a) && a != '#')
+	if (isFromFile == 2)
 	{
-		p = (Link)malloc(sizeof(Linknode));
-		p->data = a;
-		p->time = coun;
-		coun++;
-		r->next = p;
-		r = p;
+		int a;
+		Link H, p, r;
+		H = (Link)malloc(sizeof(Linknode));
+		r = H;
+
+		while (scanf("%d", &a) && a != '#')
+		{
+			p = (Link)malloc(sizeof(Linknode));
+			p->data = a;
+			p->time = coun;
+			coun++;
+			r->next = p;
+			r = p;
+		}
+		r->next = NULL;
+		return H;
 	}
-	r->next = NULL;
-	return H;
+	else
+	{
+		FILE *fpRead = fopen("data.txt", "r");
+		if (fpRead == NULL)
+		{
+			printf("文件不存在……");
+		}
+		int a;
+		Link H, p, r;
+		H = (Link)malloc(sizeof(Linknode));
+		r = H;
+
+		while (fscanf(fpRead,"%d", &a) && a != '#')
+		{
+			p = (Link)malloc(sizeof(Linknode));
+			p->data = a;
+			p->time = coun-1;
+			coun++;
+			r->next = p;
+			r = p;
+		}
+		r->next = NULL;
+		return H;
+	}
 }
 
 void Adjmax(Link H)
@@ -70,12 +97,36 @@ void main()
 {
 	Link p,q;
 	int b;
-	do
+	int isFromFile;
+	printf("请选择输入方式：1.文件输入；2.键盘输入\n");
+	scanf("%d", &isFromFile);
+	if (isFromFile == 2)
 	{
-		printf("input k:\n");
-		scanf("%d", &k);
-		printf("Please input numbers:\n");
-		p = Createlist();
+		do
+		{
+			printf("input k:\n");
+			scanf("%d", &k);
+			printf("Please input numbers:\n");
+			p = Createlist(isFromFile);
+			Adjmax(p);
+			while (p->next)
+			{
+				q = p;
+				p = p->next;
+				free(q);
+			}
+			free(p);
+			printf("\n是否继续？是：1；否：0\n");
+			getchar();
+			scanf("%d", &b);
+
+		} while (b);
+	}
+	else
+	{
+		FILE *fpRead = fopen("data.txt", "r");
+		fscanf(fpRead, "%d", &k);
+		p = Createlist(isFromFile);
 		Adjmax(p);
 		while (p->next)
 		{
@@ -84,9 +135,6 @@ void main()
 			free(q);
 		}
 		free(p);
-		printf("\n是否继续？是：1；否：0\n");
-		getchar();
-		scanf("%d", &b);
-		
-	} while (b);
+	}
+	system("pause");
 }
